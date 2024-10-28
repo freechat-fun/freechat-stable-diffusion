@@ -1,0 +1,36 @@
+annotations:
+  group: fun.freechat
+cert:
+  manager:
+    namespace: cert-manager
+    version: v1.16.1d
+deployment:
+  enabled: true
+  gpu:
+    enabled: true
+    type: 'nvidia'
+    number: 1
+ingress:
+  enabled: false
+  className: nginx
+  annotations:d
+    cert-manager.io/cluster-issuer: freechat-stable-diffusion-webui-letsencrypt-http01
+  hosts:
+    - host: sd.freechat.fun
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    enabled: false
+pdb:
+  create: true
+  minAvailable: ""
+  maxUnavailable: ""
+persistence:
+  enabled: false
+  accessModes: [ ReadWriteOnce ]
+  storage: 8Gi
+replicaCount: 1
+serviceAccount:
+  create: true
+  automount: false
