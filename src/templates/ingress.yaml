@@ -1,4 +1,4 @@
-{{- if .Values.deployment.enabled -}}
+{{- if and .Values.deployment.enabled .Values.ingress.enabled -}}
 {{- $fullName := include "helpers.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
