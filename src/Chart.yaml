@@ -1,6 +1,6 @@
 annotations:
   licenses: Apache-2.0
-appVersion: latest
+appVersion: latest-cuda
 description: A Helm chart for stable-diffusion webui
 maintainers:
   - email: dev.freechat.fun@gmail.com

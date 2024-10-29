@@ -42,16 +42,16 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
-            {{- if and .Values.deployment.gpu.enabled (or (eq .Values.deployment.gpu.type "nvidia") (not .Values.deployment.gpu.type))}}
-            - name: PATH
-              value: /usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-            {{- end}}
-            {{- with .Values.extraEnv }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: ["bash", "webui.sh"]
           args:
+            - "--listen"
+            - "--port"
+            - {{ .Values.service.port | default "7680" | quote }}
           {{- with .Values.extraArgs }}
-             {{- toYaml . | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.resources }}
           resources:
@@ -85,24 +85,37 @@ spec:
             {{- $ressources := deepCopy (dict "limits" $limits) | mergeOverwrite .Values.resources }}
             {{- toYaml $ressources | nindent 12 }}
           {{- end}}
+          {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end}}
+          {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end}}
           volumeMounts:
-            - mountPath: /config
-              name: config
-            - mountPath: /cert
-              name: cert
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/log
+              subPath: log
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/embeddings
+              subPath: embeddings
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/extensions
+              subPath: extensions
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/localizations
+              subPath: localizations
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/models
+              subPath: models
+            - name: persistence
+              mountPath: /app/stable-diffusion-webui/outputs
+              subPath: outputs
       volumes:
-        - name: config
-          configMap:
-            name: trojan-config
-        - name: cert
-          secret:
-            secretName: {{ include "helpers.name" . }}-tls
+        - name: persistence
+          persistentVolumeClaim:
+            claimName: {{ include "helpers.name" . }}-pvc
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

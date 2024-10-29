@@ -9,4 +9,4 @@ helm upgrade --kubeconfig ${KUBE_CONFIG} --namespace ${NAMESPACE} -f ${values_ya
   --set deployment.enabled=true \
   --set persistence.enabled=false \
   ${ARGS[*]} \
-  ${PROJECT_NAME} ollama-helm/ollama
+  ${PROJECT_NAME} ${HELM_CONFIG_HOME}

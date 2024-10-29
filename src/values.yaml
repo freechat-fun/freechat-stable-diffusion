@@ -1,22 +1,26 @@
 annotations:
   group: fun.freechat
+autoscaling:
+  enabled: false
 cert:
   manager:
     namespace: cert-manager
-    version: v1.16.1d
+    version: v1.16.1
 deployment:
   enabled: true
   gpu:
     enabled: true
     type: 'nvidia'
     number: 1
+image:
+  repository: siutin/stable-diffusion-webui-docker
 ingress:
   enabled: false
   className: nginx
-  annotations:d
+  annotations:
     cert-manager.io/cluster-issuer: freechat-stable-diffusion-webui-letsencrypt-http01
   hosts:
-    - host: sd.freechat.fun
+    - host: sdw.freechat.fun
       paths:
         - path: /
           pathType: Prefix
@@ -29,8 +33,36 @@ pdb:
 persistence:
   enabled: false
   accessModes: [ ReadWriteOnce ]
-  storage: 8Gi
+  storage: 60Gi
 replicaCount: 1
+livenessProbe:
+  enabled: false
+  failureThreshold: 60
+  httpGet:
+    path: /internal/ping
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 5
+readinessProbe:
+  enabled: true
+  failureThreshold: 6
+  httpGet:
+    path: /internal/ping
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
+resources:
+  requests: {}
+  limits: {}
+service:
+  port: 7860
+  type: ClusterIP
 serviceAccount:
   create: true
   automount: false
