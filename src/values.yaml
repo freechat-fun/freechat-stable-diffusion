@@ -28,8 +28,8 @@ ingress:
     enabled: false
 pdb:
   create: true
-  minAvailable: ""
-  maxUnavailable: ""
+  minAvailable: ''
+  maxUnavailable: ''
 persistence:
   enabled: false
   accessModes: [ ReadWriteOnce ]
