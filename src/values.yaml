@@ -30,6 +30,8 @@ pdb:
   create: true
   minAvailable: ''
   maxUnavailable: ''
+podSecurityContext:
+  fsGroup: 10000
 persistence:
   enabled: false
   accessModes: [ ReadWriteOnce ]
