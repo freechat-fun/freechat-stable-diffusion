@@ -102,28 +102,33 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end}}
           volumeMounts:
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/log
               subPath: log
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/embeddings
               subPath: embeddings
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/extensions
               subPath: extensions
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/localizations
               subPath: localizations
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/models
               subPath: models
-            - name: persistence
+            - name: data
               mountPath: /app/stable-diffusion-webui/outputs
               subPath: outputs
       volumes:
-        - name: persistence
+        {{- if .Values.persistence.enabled }}
+        - name: data
           persistentVolumeClaim:
             claimName: {{ include "helpers.name" . }}-pvc
+        {{- else }}
+        - name: data
+          emptyDir: {}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
