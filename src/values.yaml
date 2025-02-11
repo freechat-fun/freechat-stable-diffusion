@@ -6,12 +6,10 @@ cert:
   manager:
     namespace: cert-manager
     version: v1.16.1
-deployment:
+gpu:
   enabled: true
-  gpu:
-    enabled: true
-    type: 'nvidia'
-    number: 1
+  type: 'nvidia'
+  number: 1
 image:
   repository: siutin/stable-diffusion-webui-docker
 ingress:
@@ -26,16 +24,20 @@ ingress:
           pathType: Prefix
   tls:
     enabled: false
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  annotations:
+    helm.sh/resource-policy: keep
+  size: 60Gi
+  storageClass: default
 pdb:
   create: true
   minAvailable: ''
   maxUnavailable: ''
 podSecurityContext:
   fsGroup: 10000
-persistence:
-  enabled: false
-  accessModes: [ ReadWriteOnce ]
-  storage: 60Gi
 replicaCount: 1
 livenessProbe:
   enabled: false
@@ -63,6 +65,7 @@ resources:
   requests: {}
   limits: {}
 service:
+  enabled: true
   port: 7860
   type: ClusterIP
 serviceAccount:
